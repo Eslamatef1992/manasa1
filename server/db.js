@@ -105,6 +105,28 @@ function seed() {
   }
 }
 
+// First run: client logos from server/seed/clients
+function seedClients() {
+  if (db.prepare('SELECT COUNT(*) c FROM clients').get().c > 0) return;
+  const list = [
+    ['qaya', 'Qaya', 'https://qayakw.com'],
+    ['thek', 'The K', 'https://thek.vip'],
+    ['corny', 'Corny', ''],
+    ['7yaak', '7yaak', ''],
+    ['khaleet', 'Khaleet', 'https://www.khaleet.com'],
+    ['premiumphone', 'Premium Phone', ''],
+    ['pantry', 'Pantry', ''],
+  ];
+  const ins = db.prepare('INSERT INTO clients (name, logo, url, sort_order) VALUES (?,?,?,?)');
+  list.forEach(([file, name, url], i) => {
+    const src = path.join(__dirname, 'seed', 'clients', `${file}.webp`);
+    if (!fs.existsSync(src)) return;
+    const out = `logo-seed-${file}.webp`;
+    fs.copyFileSync(src, path.join(UPLOAD_DIR, out));
+    ins.run(name, out, url, i);
+  });
+}
+
 function getSettings() {
   const out = {};
   for (const r of db.prepare('SELECT key, value FROM settings').all()) out[r.key] = r.value;
@@ -112,4 +134,4 @@ function getSettings() {
   return out;
 }
 
-module.exports = { db, seed, getSettings, UPLOAD_DIR, ROOT };
+module.exports = { db, seed: () => { seed(); seedClients(); }, getSettings, UPLOAD_DIR, ROOT };

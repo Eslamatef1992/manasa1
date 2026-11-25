@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect, useState } from 'react';
 import { useLang } from '../i18n.jsx';
 import Orbit from './Orbit.jsx';
 import Icon from './Icons.jsx';
+import TemplateGrid from './TemplateGrid.jsx';
 
 const HeroScene = lazy(() => import('../three/HeroScene.jsx'));
 
@@ -223,31 +224,16 @@ function Steps() {
 }
 
 function Templates({ templates }) {
-  const { t, lang } = useLang();
+  const { t } = useLang();
   if (!templates?.length) return null;
   return (
     <section className="section templates" id="templates">
-      <div className="wrap sec-head">
-        <h2>{t.templates.title}</h2>
-        <p>{t.templates.sub}</p>
-      </div>
-      <div className="tpl-strip" tabIndex={0} aria-label={t.templates.title}>
-        {templates.map((tp) => {
-          const name = lang === 'ar' && tp.name_ar ? tp.name_ar : tp.name_en;
-          const cat = lang === 'ar' && tp.category_ar ? tp.category_ar : tp.category_en;
-          return (
-            <article className="tpl" key={tp.id}>
-              <div className="tpl-frame">
-                <div className="tpl-bar"><i /><i /><i /></div>
-                <img src={tp.image_url} alt={name} loading="lazy" />
-              </div>
-              <div className="tpl-meta">
-                <div><h3>{name}</h3>{cat && <span>{cat}</span>}</div>
-                {tp.demo_url && <a className="btn btn-line sm" href={tp.demo_url} target="_blank" rel="noreferrer">{t.templates.view}</a>}
-              </div>
-            </article>
-          );
-        })}
+      <div className="wrap">
+        <div className="sec-head">
+          <h2>{t.templates.title}</h2>
+          <p>{t.templates.sub}</p>
+        </div>
+        <TemplateGrid templates={templates} />
       </div>
     </section>
   );

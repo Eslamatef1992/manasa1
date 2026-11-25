@@ -272,6 +272,7 @@ function Clients() {
     try { await api('/admin/clients', { method: 'POST', form: toForm(form, file, 'logo') }); setForm({ name: '', url: '' }); setFile(null); e.target.reset(); load(); }
     catch (er) { setErr(er.message); }
   }
+  async function saveField(c, fields) { await api(`/admin/clients/${c.id}`, { method: 'PUT', form: toForm(fields) }); load(); }
   async function replaceLogo(c, f) { await api(`/admin/clients/${c.id}`, { method: 'PUT', form: toForm({}, f, 'logo') }); load(); }
   async function toggle(c) { await api(`/admin/clients/${c.id}`, { method: 'PUT', form: toForm({ visible: !c.visible }) }); load(); }
   async function remove(c) { if (!confirm(`Remove ${c.name}?`)) return; await api(`/admin/clients/${c.id}`, { method: 'DELETE' }); load(); }
@@ -298,7 +299,8 @@ function Clients() {
         {items.map((c, i) => (
           <div className={`ad-logo ${c.visible ? '' : 'off'}`} key={c.id}>
             <div className="ad-logo-img">{c.logo_url ? <img src={c.logo_url} alt="" /> : <span>{c.name}</span>}</div>
-            <b>{c.name}</b>
+            <input defaultValue={c.name} aria-label="Client name" onBlur={(e) => e.target.value.trim() && e.target.value !== c.name && saveField(c, { name: e.target.value.trim() })} />
+            <input defaultValue={c.url} placeholder="https://… (optional)" aria-label="Client website" onBlur={(e) => e.target.value !== c.url && saveField(c, { url: e.target.value.trim() })} />
             <div className="ad-row wrap">
               <button className="ad-btn sm" onClick={() => move(i, -1)} aria-label="Move earlier">↑</button>
               <button className="ad-btn sm" onClick={() => move(i, 1)} aria-label="Move later">↓</button>
